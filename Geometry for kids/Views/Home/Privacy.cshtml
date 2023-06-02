@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "Geometry for Kids";
+}
+
+<ol class="breadcrumb" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;">
+    <li class="breadcrumb-item active" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;"> <stong> Geometry for Kids - Surface Area Calculator</stong></li>
+</ol>
+
+<br />
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geometry for Kids - Surface Area Calculator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Geometry for Kids - Surface Area Calculator</h1>
+
+    <form id="areaForm">
+
+        <ol class="breadcrumb" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;">
+            <li class="breadcrumb-item active" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;"> <stong> Select a Shape:</stong></li>
+        </ol>
+        <br />
+        <select id="shapeSelect">
+            <option value="">Select a shape</option>
+            <option value="Rectangle">Rectangle</option>
+            <option value="Triangle">Triangle</option>
+            <option value="Circle">Circle</option>
+            <option value="Trapezoid">Trapezoid</option>
+            <option value="Ellipse">Ellipse</option>
+        </select>
+
+        <div id="formulaContainer" style="display: none;">
+            <h2>Area Calculation Formula:</h2>
+            <img id="formulaImage" src="" alt="Area Calculation Formula">
+        </div>
+
+
+        <div id="rectangleDimensions" class="dimensionGroup" style="display: none;">
+            <h2>Rectangle Dimensions:</h2>
+            <input type="number" id="lengthInput" placeholder="Length">
+            <input type="number" id="widthInput" placeholder="Width">
+        </div>
+
+        <div id="triangleDimensions" class="dimensionGroup" style="display: none;">
+            <h2>Triangle Dimensions:</h2>
+            <input type="number" id="baseInput" placeholder="Base">
+            <input type="number" id="heightInput" placeholder="Height">
+        </div>
+
+        <div id="circleDimensions" class="dimensionGroup" style="display: none;">
+            <h2>Circle Dimensions:</h2>
+            <input type="number" id="radiusInput" placeholder="Radius">
+        </div>
+
+        <div id="trapezoidDimensions" class="dimensionGroup" style="display: none;">
+            <h2>Trapezoid Dimensions:</h2>
+            <input type="number" id="base1Input" placeholder="Base 1">
+            <input type="number" id="base2Input" placeholder="Base 2">
+            <input type="number" id="height2Input" placeholder="Height">
+        </div>
+
+        <div id="ellipseDimensions" class="dimensionGroup" style="display: none;">
+            <h2>Ellipse Dimensions:</h2>
+            <input type="number" id="majorAxisInput" placeholder="Major Axis">
+            <input type="number" id="minorAxisInput" placeholder="Minor Axis">
+        </div>
+
+        <button type="submit" class="btn btn-danger btn-lg" style="margin-top:8px;" value="Calculate" title="click to Calculato!">Calculate Area</button>
+        <div id="resultContainer"></div>
+
+    </form>
+  
+    
+    <ol class="breadcrumb" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;">
+        <li class="breadcrumb-item active" id="resultContainer" style="margin-top:5px; width: 100%; background-color:aliceblue; color: black; font-family: Cambria; padding: 5px; font: bolder;"> </li>
+    </ol>
+    <script>
+        $(document).ready(function () {
+            $("#shapeSelect").change(function () {
+                var selectedShape = $(this).val();
+                $(".dimensionGroup").hide();
+                $("#" + selectedShape.toLowerCase() + "Dimensions").show();
+
+                // Display the formula image
+                var formulaImagePath = selectedShape.toLowerCase() + ".jpg";
+                $("#formulaImage").attr("src", formulaImagePath);
+                $("#formulaContainer").show();
+            });
+
+            $("#areaForm").submit(function (e) {
+                e.preventDefault();
+                var selectedShape = $("#shapeSelect").val();
+                var dimensions = {};
+
+                switch (selectedShape) {
+                    case "Rectangle":
+                        dimensions.length = $("#lengthInput").val();
+                        dimensions.width = $("#widthInput").val();
+                        break;
+                    case "Triangle":
+                        dimensions.base = $("#baseInput").val();
+                        dimensions.height = $("#heightInput").val();
+                        break;
+                    case "Circle":
+                        dimensions.radius = $("#radiusInput").val();
+                        break;
+                    case "Trapezoid":
+                        dimensions.base1 = $("#base1Input").val();
+                        dimensions.base2 = $("#base2Input").val();
+                        dimensions.height = $("#height2Input").val();
+                        break;
+                    case "Ellipse":
+                        dimensions.majorAxis = $("#majorAxisInput").val();
+                        dimensions.minorAxis = $("#minorAxisInput").val();
+                        break;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "Home/CalculateArea",
+                    data: { shape: selectedShape, dimensions: dimensions },
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    success: function (result) {
+                        $("#resultContainer").html(result);
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                    error: function () {
+                        alert("An error occurred while calculating the area.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
